@@ -2,18 +2,18 @@
 require("awful")
 require("awful.autofocus")
 require("awful.rules")
+require("awful.remote")
 -- Theme handling library
 require("beautiful")
 -- Notification library
 require("naughty")
-require("shifty")
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, and wallpapers
 beautiful.init("/usr/local/stow/awesome-3.4.9/share/awesome/themes/default/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
-terminal = "xterm"
+terminal = "gnome-terminal"
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
 
@@ -42,57 +42,58 @@ layouts =
 }
 -- }}}
 
+
+mytags = { { name = "mail", screen = 1 },
+	   { name = "www", screen = 1 },
+	   { name = "emacs", screen = 2 },
+	   { name = "eclipse", screen = 2 }, 
+	}
+
+function assign_tabs(tags_defs, tags)
+   local tags_by_screen = {}
+   local tagnames_by_screen = {}
+   for s = 1, screen.count() do
+      tags_by_screen[s] = {}
+      tagnames_by_screen[s] = {}
+   end
+   for i, tag in ipairs(tags_defs) do
+      local s = math.min(tag.screen, screen.count())
+      table.insert(tags_by_screen[s], 
+		   (# tags_by_screen[s] + 1) .. ":" .. tag.name)
+      table.insert(tagnames_by_screen[s], tag.name)
+   end
+   for s = 1, screen.count() do
+      tags[s] = awful.tag(tags_by_screen[s], s, layouts[1])
+   end
+   local tags_ref = {}
+   for s = 1, screen.count() do
+     for t = 1, #tags[s] do
+       tags_ref[tagnames_by_screen[s][t]] = {tag = tags[s][t],
+					     screen = s}
+     end
+   end
+   return tags_ref
+end
+
+tags = {}
+tagname_refs = assign_tabs(mytags, tags)
+
+-- Add a new tab to the current screen
+function newtab(name)
+   local name = (# tags[mouse.screen] + 1) .. ":" .. name
+   table.insert(tags[mouse.screen], awful.tag.add(name))
+end
+
+
+
 -- {{{ Tags
 -- Define a tag table which hold all screen tags.
---tags = {}
---for s = 1, screen.count() do
-    -- Each screen has its own tag table.
---    tags[s] = awful.tag({ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, s, layouts[1])
---end
+-- tags = {}
+-- for s = 1, screen.count() do
+--     -- Each screen has its own tag table.
+--     tags[s] = awful.tag({ "1:mail", 2, 3, 4, 5, 6, 7, 8, 9 }, s, layouts[1])
+-- end
 -- }}}
-
-
-shifty.config.tags = {
-   ["1:sys"] = { init = true, position = 1, screen = 1, mwfact = 0.60                 },
-   ["3:www"] = { layout = "tile", exclusive = true, max_clients = 1, position = 3, spawn = "firefox"   },
-  ["2:term"] = { persist = true, position = 2,                                        },
-  ["ardour"] = { nopopup = true, leave_kills = true,                                  },
-     ["p2p"] = { icon = "/usr/share/pixmaps/p2p.png", icon_only = true,               },
-    ["gimp"] = { layout = "tile", mwfact = 0.18, icon="/usr/share/pixmaps/gimp.png",  },
-      ["fs"] = { rel_index = 1,                                                       },
-}
-
-shifty.config.apps = {
-        { match = { "htop", "Wicd", "jackctl"       }, tag = "1:sys",        screen = 1,     },
-        { match = {"Iceweasel.*", "Firefox.*"       }, tag = "3:www",                        },
-        { match = {"urxvt", "xterm"                          }, tag = "2:term",       screen = 1,     },
-        { match = {"foobar2000.exe",                }, tag = "fb",           nopopup = true, },
-        { match = {"Ardour.*", "Jamin",             }, tag = "ardour",                       },
-        { match = {"Live.*",                        }, tag = "live",         nopopup = true, },
-        { match = {"Deluge","nicotine"              }, tag = "p2p",                          },
-        { match = {"Gimp","Ufraw"                   }, tag = { "graph", "gimp" }             },
-        { match = {"gimp%-image%-window"            }, slave = true,                         },
-        { match = {"gqview"                         }, tag = { "graph", "gqview" }           },
-        { match = { "Pcmanfm"                       }, tag = "fs",                           },
-        { match = {"gcolor2", "xmag"                }, intrusive = true,                     },
-        { match = {"gcolor2"                        }, geometry = { 100,100,nil,nil },       },
-        { match = {"recordMyDesktop", "MPlayer", "xmag", 
-                                                    }, float = true,                         },
-        { match = { "" }, buttons = {
-                             button({ }, 1, function (c) client.focus = c; c:raise() end),
-                             button({ modkey }, 1, function (c) awful.mouse.client.move() end),
-                             button({ modkey }, 3, awful.mouse.client.resize ), }, },
-}
-
-shifty.config.defaults = {
-  layout = "max", 
-  run = function(tag) naughty.notify({ text = tag.name }) end,
-}
-
-shifty.init()
-
-
-
 
 -- {{{ Menu
 -- Create a laucher widget and a main menu
@@ -259,8 +260,7 @@ globalkeys = awful.util.table.join(
                   mypromptbox[mouse.screen].widget,
                   awful.util.eval, nil,
                   awful.util.getdir("cache") .. "/history_eval")
-              end),
-    awful.key({ "Control" , "Mod1" }, "l", function () awful.util.spawn("xscreensaver-command --lock") end)
+              end)
 )
 
 clientkeys = awful.util.table.join(
@@ -280,14 +280,43 @@ clientkeys = awful.util.table.join(
 )
 
 -- Compute the maximum number of digit we need, limited to 9
---keynumber = 0
---for s = 1, screen.count() do
---   keynumber = math.min(9, math.max(#tags[s], keynumber));
---end
+-- keynumber = 0
+-- for s = 1, screen.count() do
+--    keynumber = math.min(9, math.max(#tags[s], keynumber));
+-- end
 
 -- Bind all key numbers to tags.
 -- Be careful: we use keycodes to make it works on any keyboard layout.
 -- This should map on the top row of your keyboard, usually 1 to 9.
+for i = 1, 9 do
+    globalkeys = awful.util.table.join(globalkeys,
+        awful.key({ modkey }, "#" .. i + 9,
+                  function ()
+                        local screen = mouse.screen
+                        if tags[screen][i] then
+                            awful.tag.viewonly(tags[screen][i])
+                        end
+                  end),
+        awful.key({ modkey, "Control" }, "#" .. i + 9,
+                  function ()
+                      local screen = mouse.screen
+                      if tags[screen][i] then
+                          awful.tag.viewtoggle(tags[screen][i])
+                      end
+                  end),
+        awful.key({ modkey, "Shift" }, "#" .. i + 9,
+                  function ()
+                      if client.focus and tags[client.focus.screen][i] then
+                          awful.client.movetotag(tags[client.focus.screen][i])
+                      end
+                  end),
+        awful.key({ modkey, "Control", "Shift" }, "#" .. i + 9,
+                  function ()
+                      if client.focus and tags[client.focus.screen][i] then
+                          awful.client.toggletag(tags[client.focus.screen][i])
+                      end
+                  end))
+end
 
 clientbuttons = awful.util.table.join(
     awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
@@ -297,6 +326,7 @@ clientbuttons = awful.util.table.join(
 -- Set keys
 root.keys(globalkeys)
 -- }}}
+
 
 -- {{{ Rules
 awful.rules.rules = {
@@ -349,3 +379,16 @@ end)
 client.add_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.add_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
+
+
+-- start programs
+function start_programs()
+   -- start emacs on appropriate tab
+   awful.screen.focus(tagname_refs["emacs"].screen)
+   awful.tag.viewonly(tagname_refs["emacs"].tag)
+   awful.layout.set(awful.layout.suit.tile.left)
+   awful.util.spawn("emacs")
+   awful.util.spawn(terminal)
+   awful.tag.incmwfact(0.15)
+   running = true
+end
