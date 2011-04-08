@@ -51,9 +51,10 @@ layouts =
 
 
 mytags = { { name = "mail", screen = 1 },
-	   { name = "www", screen = 1 },
-	   { name = "emacs", screen = 2 },
-	   { name = "eclipse", screen = 2 },
+           { name = "im", screen = 1 },
+           { name = "www", screen = 1 },
+           { name = "emacs", screen = 2 },
+           { name = "eclipse", screen = 2 },
 	}
 
 function assign_tabs(tags_defs, tags)
@@ -350,6 +351,12 @@ awful.rules.rules = {
       properties = { floating = true } },
     { rule = { class = "gimp" },
       properties = { floating = true } },
+    { rule = { class = "Thunderbird" },
+      properties = { tag = tagname_refs["mail"].tag }},
+    { rule = { class = "Pidgin" },
+      properties = { tag = tagname_refs["im"].tag }},
+    { rule = { class = "Chromium-browser" },
+      properties = { tag = tagname_refs["www"].tag }},
     -- Set Firefox to always map on tags number 2 of screen 1.
     -- { rule = { class = "Firefox" },
     --   properties = { tag = tags[1][2] } },
@@ -387,20 +394,10 @@ client.add_signal("focus", function(c) c.border_color = beautiful.border_focus e
 client.add_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
 
+awful.screen.focus(tagname_refs["mail"].screen)
+awful.tag.viewonly(tagname_refs["mail"].tag)
+awful.layout.set(awful.layout.suit.magnifier)
 
--- start programs
--- Emacs required environment variables defined in zsh configuration
--- They have to be set by .login script.
-
--- function start_programs()
---    -- start emacs on appropriate tab
---    awful.screen.focus(tagname_refs["emacs"].screen)
---    awful.tag.viewonly(tagname_refs["emacs"].tag)
---    awful.layout.set(awful.layout.suit.tile.left)
---    awful.util.spawn("emacs --debug-init")
---    awful.util.spawn(terminal)
---    awful.tag.incmwfact(0.15)
---    running = true
--- end
-
--- start_programs()
+awful.screen.focus(tagname_refs["www"].screen)
+awful.tag.viewonly(tagname_refs["www"].tag)
+awful.layout.set(awful.layout.suit.max)
