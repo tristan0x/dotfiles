@@ -27,8 +27,8 @@
 			   awesome-command
 			   awesome-output-buffer))
 
-(defun awesome-send-buffer (buffer)
-  (interactive "b")
+(defun awesome-send-buffer ()
+  (interactive)
   (save-excursion
     (awesome-send-region (point-min) (point-max))))
 
@@ -36,6 +36,10 @@
 
 (define-derived-mode awesome-mode lua-mode "Awesome"
   "Major mode for editing awesome scripts"
+
+  (use-local-map awesome-mode-map)
+  (define-key awesome-mode-map "\C-c\C-c" 'awesome-send-buffer)
+  (define-key awesome-mode-map "\C-c|" 'awesome-send-region)
 )
 
 
