@@ -33,10 +33,9 @@
     (awesome-send-region (point-min) (point-max))))
 
 (require 'derived)
-
-(define-derived-mode awesome-mode lua-mode "Awesome"
-  "Major mode for editing awesome scripts"
-)
+(define-derived-mode 
+  awesome-mode lua-mode "Awesome"
+  "Major mode for editing awesome scripts.")
 
 
 (provide 'awesome-mode)
