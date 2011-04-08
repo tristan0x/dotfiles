@@ -34,7 +34,8 @@
 
 (require 'derived)
 
-(define-derived-mode awesome-mode lua-mode "Awesome"
+(define-derived-mode 
+  awesome-mode lua-mode "Awesome"
   "Major mode for editing awesome scripts"
 
   (use-local-map awesome-mode-map)
