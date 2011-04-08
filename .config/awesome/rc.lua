@@ -8,9 +8,16 @@ require("beautiful")
 -- Notification library
 require("naughty")
 
+local os = os
+local string = string
+
+local install_prefix = string.gsub(os.getenv("AWESOMEWM"), "/[^/]+$", "") .. "/.."
+
 -- {{{ Variable definitions
 -- Themes define colours, icons, and wallpapers
-beautiful.init("/usr/local/stow/awesome-3.4.9/share/awesome/themes/default/theme.lua")
+beautiful.init(install_prefix .. "/share/awesome/themes/default/theme.lua")
+--beautiful.init("/data.2/tcarel/root/share/awesome/themes/default/theme.lua")
+
 
 -- This is used later as the default terminal and editor to run.
 terminal = "gnome-terminal"
@@ -44,9 +51,10 @@ layouts =
 
 
 mytags = { { name = "mail", screen = 1 },
-	   { name = "www", screen = 1 },
-	   { name = "emacs", screen = 2 },
-	   { name = "eclipse", screen = 2 }, 
+           { name = "im", screen = 1 },
+           { name = "www", screen = 1 },
+           { name = "emacs", screen = 2 },
+           { name = "eclipse", screen = 2 },
 	}
 
 function assign_tabs(tags_defs, tags)
@@ -58,7 +66,7 @@ function assign_tabs(tags_defs, tags)
    end
    for i, tag in ipairs(tags_defs) do
       local s = math.min(tag.screen, screen.count())
-      table.insert(tags_by_screen[s], 
+      table.insert(tags_by_screen[s],
 		   (# tags_by_screen[s] + 1) .. ":" .. tag.name)
       table.insert(tagnames_by_screen[s], tag.name)
    end
@@ -343,6 +351,12 @@ awful.rules.rules = {
       properties = { floating = true } },
     { rule = { class = "gimp" },
       properties = { floating = true } },
+    { rule = { class = "Thunderbird" },
+      properties = { tag = tagname_refs["mail"].tag }},
+    { rule = { class = "Pidgin" },
+      properties = { tag = tagname_refs["im"].tag }},
+    { rule = { class = "Chromium-browser" },
+      properties = { tag = tagname_refs["www"].tag }},
     -- Set Firefox to always map on tags number 2 of screen 1.
     -- { rule = { class = "Firefox" },
     --   properties = { tag = tags[1][2] } },
@@ -380,17 +394,10 @@ client.add_signal("focus", function(c) c.border_color = beautiful.border_focus e
 client.add_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
 
+awful.screen.focus(tagname_refs["mail"].screen)
+awful.tag.viewonly(tagname_refs["mail"].tag)
+awful.layout.set(awful.layout.suit.magnifier)
 
--- start programs
-function start_programs()
-   -- start emacs on appropriate tab
-   awful.screen.focus(tagname_refs["emacs"].screen)
-   awful.tag.viewonly(tagname_refs["emacs"].tag)
-   awful.layout.set(awful.layout.suit.tile.left)
-   awful.util.spawn("emacs")
-   awful.util.spawn(terminal)
-   awful.tag.incmwfact(0.15)
-   running = true
-end
-
-start_programs()
+awful.screen.focus(tagname_refs["www"].screen)
+awful.tag.viewonly(tagname_refs["www"].tag)
+awful.layout.set(awful.layout.suit.max)
