@@ -13,6 +13,8 @@ if type gnome-keyring-daemon >/dev/null 2>&1 ;
 fi
 
 gnome-volume-control-applet &
-xscreensaver -nosplash &
+if [ "$XSCREENSAVER" = xscreensaver-command ] ;then
+    xscreensaver -nosplash &
+fi
 nm-applet &
 exec ${AWESOMEWM:-awesome}
