@@ -93,6 +93,18 @@ function newtab(name)
 end
 
 
+awful.layout.set(awful.layout.suit.tile.right,
+                 tagname_refs["im"].tag)
+awful.layout.set(awful.layout.suit.magnifier,
+                 tagname_refs["mail"].tag)
+awful.layout.set(awful.layout.suit.max,
+                 tagname_refs["www"].tag)
+awful.layout.set(awful.layout.suit.tile.left,
+                 tagname_refs["emacs"].tag)
+awful.layout.set(awful.layout.suit.max,
+                 tagname_refs["eclipse"].tag)
+
+
 
 -- {{{ Tags
 -- Define a tag table which hold all screen tags.
@@ -393,11 +405,3 @@ end)
 client.add_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.add_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
-
-awful.screen.focus(tagname_refs["mail"].screen)
-awful.tag.viewonly(tagname_refs["mail"].tag)
-awful.layout.set(awful.layout.suit.magnifier)
-
-awful.screen.focus(tagname_refs["www"].screen)
-awful.tag.viewonly(tagname_refs["www"].tag)
-awful.layout.set(awful.layout.suit.max)
