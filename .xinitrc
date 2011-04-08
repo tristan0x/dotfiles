@@ -17,9 +17,9 @@ fi
 
 # Look for session locker
 if type gnome-screensaver-command >/dev/null 2>&1 ; then
-    export XSCREENSAVER=gnome-screensaver-command
+    export SCREENSAVER_LOCK_CMD="gnome-screensaver-command --lock"
 elif type xscreensaver-command >/dev/null 2>&1 ; then
-    export XSCREENSAVER=xscreensaver
+    export SCREENSAVER_LOCK_CMD="xscreensaver-command --lock"
     xscreensaver -nosplash &
 fi
 
