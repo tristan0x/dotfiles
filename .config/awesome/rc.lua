@@ -392,3 +392,5 @@ function start_programs()
    awful.tag.incmwfact(0.15)
    running = true
 end
+
+start_programs()
