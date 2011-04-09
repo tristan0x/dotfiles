@@ -4,24 +4,25 @@ if [ -f ~/.login ] ; then
     . ~/.login
 fi
 
-# Locate window manager
-if type awesome >/dev/null 2>&1 ; then
-    AWESOMEWM=`type awesome | awk '{print $NF;}'`
-else
-    for dir in /data.2/$USER/root/bin ; do
-        if [ -f "$dir/awesome" ] ;then
-            export AWESOMEWM="$dir/awesome"
-        fi
-    done
-fi
+# return 0 if executable $1 is running, something else otherwise
+is_executable_running() {
+    ps -A | awk '{print $NF;}' | grep -q "^$1"
+}
 
-# Look for session locker
-if type gnome-screensaver-command >/dev/null 2>&1 ; then
-    export SCREENSAVER_LOCK_CMD="gnome-screensaver-command --lock"
-elif type xscreensaver-command >/dev/null 2>&1 ; then
-    export SCREENSAVER_LOCK_CMD="xscreensaver-command --lock"
-    xscreensaver -nosplash &
-fi
+run_once() {
+    is_executable_running $1 || $@
+}
+
+# Look for screen locker
+for s in gnome-screensaver xscreensaver ; do
+    if type "$s" >/dev/null 2>&1 ; then
+	# command to execute to lock screen
+	export SCREENSAVER_LOCK_CMD="$s-command --lock"
+	# start daemon if not already running.
+	run_once "$s" || "$s" &
+	break
+    fi
+done
 
 if type gnome-keyring-daemon >/dev/null 2>&1 ; then
     eval `gnome-keyring-daemon`
@@ -33,6 +34,18 @@ elif type ssh-agent >/dev/null 2>&1 ; then
     eval `ssh-agent`
 fi
 
-gnome-volume-control-applet &
-nm-applet &
-exec ${AWESOMEWM:-awesome}
+run_once gnome-volume-control-applet &
+run_once nm-applet &
+
+# Locate window manager
+if type awesome >/dev/null 2>&1 ; then
+    export AWESOMEWM=`type awesome | awk '{print $NF;}'`
+else
+    for dir in /data.2/$USER/root/bin ; do
+        if [ -f "$dir/awesome" ] ;then
+            export AWESOMEWM="$dir/awesome"
+        fi
+    done
+fi
+echo $SCREENSAVER_LOCK_CMD
+exec ${AWESOMEWM}
