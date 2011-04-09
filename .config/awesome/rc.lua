@@ -49,12 +49,20 @@ layouts =
 }
 -- }}}
 
-
-mytags = { { name = "mail", screen = 1 },
-           { name = "im", screen = 1 },
-           { name = "www", screen = 1 },
-           { name = "emacs", screen = 2 },
-           { name = "eclipse", screen = 2 },
+-- Tags to create at startup
+--   name  : name of the tab (number will be prepended)
+--   screen: the desired screen
+--   layout: the desired layout (see variable `layout' above)
+mytags = { { name = "mail", screen = 1,
+	     layout = awful.layout.suit.magnifier },
+           { name = "im", screen = 1, 
+	     layout =  awful.layout.suit.tile.right },
+           { name = "www", screen = 1,
+	     layout = awful.layout.suit.max },
+           { name = "emacs", screen = 2, 
+	     layout = awful.layout.suit.tile.left },
+           { name = "eclipse", screen = 2,
+	     layout = awful.layout.suit.max }
 	}
 
 function assign_tabs(tags_defs, tags)
@@ -64,21 +72,27 @@ function assign_tabs(tags_defs, tags)
       tags_by_screen[s] = {}
       tagnames_by_screen[s] = {}
    end
+   -- share tags among available screens
    for i, tag in ipairs(tags_defs) do
       local s = math.min(tag.screen, screen.count())
       table.insert(tags_by_screen[s],
 		   (# tags_by_screen[s] + 1) .. ":" .. tag.name)
       table.insert(tagnames_by_screen[s], tag.name)
    end
+   -- instantiate tags
    for s = 1, screen.count() do
       tags[s] = awful.tag(tags_by_screen[s], s, layouts[1])
    end
+   -- create hash table tagName -> tag instance
    local tags_ref = {}
    for s = 1, screen.count() do
-     for t = 1, #tags[s] do
-       tags_ref[tagnames_by_screen[s][t]] = {tag = tags[s][t],
-					     screen = s}
-     end
+      for t = 1, #tags[s] do
+	 tags_ref[tagnames_by_screen[s][t]] = {tag = tags[s][t], screen = s}
+      end
+   end
+   -- set tags layout
+   for i, tag in ipairs(tags_defs) do
+      awful.layout.set(tag.layout, tags_ref[tag.name].tag)
    end
    return tags_ref
 end
@@ -91,19 +105,6 @@ function newtab(name)
    local name = (# tags[mouse.screen] + 1) .. ":" .. name
    table.insert(tags[mouse.screen], awful.tag.add(name))
 end
-
-
-awful.layout.set(awful.layout.suit.tile.right,
-                 tagname_refs["im"].tag)
-awful.layout.set(awful.layout.suit.magnifier,
-                 tagname_refs["mail"].tag)
-awful.layout.set(awful.layout.suit.max,
-                 tagname_refs["www"].tag)
-awful.layout.set(awful.layout.suit.tile.left,
-                 tagname_refs["emacs"].tag)
-awful.layout.set(awful.layout.suit.max,
-                 tagname_refs["eclipse"].tag)
-
 
 
 -- {{{ Tags
