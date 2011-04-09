@@ -284,7 +284,7 @@ globalkeys = awful.util.table.join(
     awful.key({ "Control", "Mod1"}, "l",
               function()
                  awful.util.spawn(os.getenv('SCREENSAVER_LOCK_CMD'))
-              end),
+              end)
 )
 
 clientkeys = awful.util.table.join(
