@@ -47,7 +47,6 @@ layouts =
     awful.layout.suit.max.fullscreen,
     awful.layout.suit.magnifier
 }
--- }}}
 
 -- Tags to create at startup
 --   name  : name of the tab (number will be prepended)
@@ -99,6 +98,8 @@ end
 
 tags = {}
 tagname_refs = assign_tabs(mytags, tags)
+
+-- }}}
 
 -- Add a new tab to the current screen
 function newtab(name)
