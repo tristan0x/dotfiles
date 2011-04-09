@@ -16,7 +16,7 @@
                       (cons emacs-conf-d
                             '("~/.emacs.d/mode"
                               "~/.emacs.d/color-theme-6.6.0"
-                              "~/.emacs.d/mode/tuareg")))))
+                              "~/.emacs.d/mode/caml")))))
 
 
 
