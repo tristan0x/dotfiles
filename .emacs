@@ -22,4 +22,4 @@
 
 (mapcar '(lambda (arg) (load-file (expand-file-name arg)))
         '("~/.emacs.d/byte-compile.el"
-          "~/.emacs.d/rc.elc"))
+          "~/.emacs.d/rc.el"))
