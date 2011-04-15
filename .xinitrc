@@ -59,6 +59,5 @@ fi
 
 ${AWESOMEWM}
 while [ -f ~/.config/awesome/.dev ] ;do
-    ${AWESOMEWM}
-    git stash
+    ${AWESOMEWM} || git stash
 done
