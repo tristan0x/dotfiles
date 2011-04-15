@@ -56,5 +56,9 @@ else
         fi
     done
 fi
-echo $SCREENSAVER_LOCK_CMD
-exec ${AWESOMEWM}
+
+${AWESOMEWM}
+while [ -f ~/.config/awesome/.dev ] ;do
+    ${AWESOMEWM}
+    git stash
+done
