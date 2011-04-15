@@ -54,11 +54,11 @@ layouts =
 --   layout: the desired layout (see variable `layout' above)
 mytags = { { name = "mail", screen = 1,
 	     layout = awful.layout.suit.magnifier },
-           { name = "im", screen = 1, 
+           { name = "im", screen = 1,
 	     layout =  awful.layout.suit.tile.right },
            { name = "www", screen = 1,
 	     layout = awful.layout.suit.max },
-           { name = "emacs", screen = 2, 
+           { name = "emacs", screen = 2,
 	     layout = awful.layout.suit.tile.left },
            { name = "eclipse", screen = 2,
 	     layout = awful.layout.suit.max }
@@ -181,6 +181,25 @@ mytasklist.buttons = awful.util.table.join(
                                               if client.focus then client.focus:raise() end
                                           end))
 
+-- Keyboard map indicator and changer
+kbdcfg = {}
+kbdcfg.cmd = "setxkbmap"
+kbdcfg.layout = { "us", "us_intl"}
+kbdcfg.current = 1  -- us is our default layout
+kbdcfg.widget = widget({ type = "textbox", align = "right" })
+kbdcfg.widget.text = " " .. kbdcfg.layout[kbdcfg.current] .. " "
+kbdcfg.switch = function ()
+		   kbdcfg.current = kbdcfg.current % #(kbdcfg.layout) + 1
+		   local t = " " .. kbdcfg.layout[kbdcfg.current] .. " "
+		   kbdcfg.widget.text = t
+		   os.execute( kbdcfg.cmd .. t )
+		end
+
+-- Mouse bindings
+kbdcfg.widget:buttons(awful.util.table.join(
+			 awful.button({ }, 1, function () kbdcfg.switch() end)
+		   ))
+
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
     mypromptbox[s] = awful.widget.prompt({ layout = awful.widget.layout.horizontal.leftright })
@@ -212,6 +231,7 @@ for s = 1, screen.count() do
         },
         mylayoutbox[s],
         mytextclock,
+	kbdcfg.widget,
         s == 1 and mysystray or nil,
         mytasklist[s],
         layout = awful.widget.layout.horizontal.rightleft
