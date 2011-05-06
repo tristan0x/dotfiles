@@ -54,11 +54,11 @@ layouts =
 --   layout: the desired layout (see variable `layout' above)
 mytags = { { name = "mail", screen = 1,
 	     layout = awful.layout.suit.magnifier },
-           { name = "im", screen = 1, 
+           { name = "im", screen = 1,
 	     layout =  awful.layout.suit.tile.right },
            { name = "www", screen = 1,
 	     layout = awful.layout.suit.max },
-           { name = "emacs", screen = 2, 
+           { name = "emacs", screen = 2,
 	     layout = awful.layout.suit.tile.left },
            { name = "eclipse", screen = 2,
 	     layout = awful.layout.suit.max }
@@ -373,6 +373,8 @@ awful.rules.rules = {
       properties = { tag = tagname_refs["mail"].tag }},
     { rule = { class = "Pidgin" },
       properties = { tag = tagname_refs["im"].tag }},
+    { rule = { class = "Eclipse" },
+      properties = { tag = tagname_refs["eclipse"].tag }},
     { rule = { class = "Chromium-browser" },
       properties = { tag = tagname_refs["www"].tag }},
     -- Set Firefox to always map on tags number 2 of screen 1.
