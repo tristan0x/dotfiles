@@ -37,6 +37,15 @@ fi
 run_once gnome-volume-control-applet &
 run_once nm-applet &
 
+xset s off
+xset b off
+xset m 6 2
+resources=$HOME/.config/awesome/xresources
+if [ -f "$resources" ] ;then
+    xrdb -merge "$resources"
+fi
+
+
 # Locate window manager
 if type awesome >/dev/null 2>&1 ; then
     export AWESOMEWM=`type awesome | awk '{print $NF;}'`
@@ -47,5 +56,8 @@ else
         fi
     done
 fi
-echo $SCREENSAVER_LOCK_CMD
-exec ${AWESOMEWM}
+
+${AWESOMEWM}
+while [ -f ~/.config/awesome/.dev ] ;do
+    ${AWESOMEWM} || git stash
+done

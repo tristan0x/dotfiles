@@ -1,0 +1,8 @@
+emacs*Background: Black
+emacs*Foreground: white
+emacs*pointerColor: Orchid
+emacs*cursorColor: Orchid
+emacs*bitmapIcon: on
+/*emacs*font:                     9x15bold*/
+emacs*font:                     7x13bold
+emacs*ReverseVideo:             off
