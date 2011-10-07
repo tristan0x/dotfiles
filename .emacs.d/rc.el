@@ -1,1 +1,0 @@
-/udir/tcarel/synconf/modules/emacs/trunk/.emacs.d/rc.el
