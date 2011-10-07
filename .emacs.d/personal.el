@@ -1,0 +1,1 @@
+/udir/tcarel/synconf/modules/emacs/trunk/.emacs.d/personal.el
